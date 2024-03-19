@@ -8,12 +8,5 @@ services:
       - .:/code
     ports:
       - "8000:8000"
-    environment:
-      # Environment variables for Django to use the AWS RDS database
-      # Ensure these values match your AWS RDS instance configuration
-      DB_NAME: resume-matcher-aws
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_HOST: resume-matcher-aws.ch0q4qqyk0z2.us-east-2.rds.amazonaws.com # Example: mydbinstance.abcdefghijk.us-west-2.rds.amazonaws.com
-      DB_PORT: 5432 # Default PostgreSQL port
-      # Additional environment variables can go here
+    env_file:
+      - .env

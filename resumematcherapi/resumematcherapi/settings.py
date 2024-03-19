@@ -1,3 +1,4 @@
+import os
 """
 Django settings for resumematcherapi project.
 
@@ -73,12 +74,19 @@ WSGI_APPLICATION = 'resumematcherapi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+import os
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'resume-matcher'),
+        'USER': os.getenv('DB_USER', 'avtonommartushev'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Nincool7390!'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
+
 
 
 # Password validation

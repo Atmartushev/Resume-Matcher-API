@@ -4,6 +4,12 @@ from core.models import *
 from .serializers import UserSerlializer
 
 @api_view(['GET'])
+def getAllUsers(request):
+    users = User.objects.all()
+    serializer = UserSerlializer(users, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
 def getUser(request, id):
     try:
         users = User.objects.get(id = id)
@@ -17,4 +23,6 @@ def addUser(request):
     serlializer = UserSerlializer(data=request.data)
     if serlializer.is_valid():
         serlializer.save()
+    else:
+        return Response({"message": "Invalid user data"}, status=404)
     return Response(serlializer.data)

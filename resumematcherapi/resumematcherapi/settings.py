@@ -18,14 +18,20 @@ from pathlib import Path
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Assuming 'settings.py' is inside 'resumematcherapi/resumematcherapi'
+# Adjust the path traversal as necessary to point to the project root
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Use BASE_DIR to construct the path to the .env file
+env_file_path = os.path.join(BASE_DIR, '.env')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+# Load the .env file
+load_dotenv(env_file_path)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xsr+1zl4f#9$zu=efjo(#f00f=d6uu9dqz)3lw1^#7+hdp!n=a'
+# Now attempting to access SECRET_KEY
+SECRET_KEY = os.getenv('SECRET_KEY')
+if SECRET_KEY is None:
+    raise Exception("SECRET_KEY not found. Check your .env file and its path.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,11 +92,11 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'NAME': os.getenv('resume-matcher-aws'),  # Your RDS database name
+        'USER': os.getenv('RDS_USERNAME'),  # Your RDS instance username
+        'PASSWORD': os.getenv('RDS_PASSWORD'),  # Your RDS password
+        'HOST': os.getenv('RDS_HOSTNAME'),  # Your RDS instance endpoint
+        'PORT': os.getenv('RDS_PORT', '5432'),  # Your RDS instance port, default is 5432
     }
 }
 

@@ -5,5 +5,5 @@ urlpatterns = [
     path('user', views.getAllUsers),
     path('user/<int:id>', views.getUser),
     path('user/<str:email>', views.getUserByEmail),
-    path('createUser/add', views.addUser)
+    path('createUser', views.addUser)
 ]

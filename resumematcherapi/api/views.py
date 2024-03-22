@@ -12,8 +12,17 @@ def getAllUsers(request):
 @api_view(['GET'])
 def getUser(request, id):
     try:
-        users = User.objects.get(id = id)
-        serializer = UserSerlializer(users)
+        user = User.objects.get(id = id)
+        serializer = UserSerlializer(user)
+        return Response(serializer.data)
+    except:
+        return Response({"message": "User not found"}, status=404)
+    
+@api_view(['GET'])
+def getUserByEmail(request, email):
+    try:
+        user = User.objects.get(email = email)
+        serializer = UserSerlializer(user)
         return Response(serializer.data)
     except:
         return Response({"message": "User not found"}, status=404)

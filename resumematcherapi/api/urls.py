@@ -5,5 +5,12 @@ urlpatterns = [
     path('user', views.getAllUsers),
     path('user/id/<int:id>', views.getUser),
     path('user/email/<str:email>', views.getUserByEmail),
-    path('user/add', views.addUser)
+    path('user/add', views.addUser),
+
+    #JOBS
+    path('job/all/user/id/<int:user_id>', views.getAllJobsByUserId),
+
+
+    #Candidates
+    path('candidate/all/job/id/<int:job_id>',views.getAllCandidatesByJobId)
 ]

@@ -91,6 +91,8 @@ def candidate_score(request, job_id):
 
         # You may still want to save the candidate or log the score here
         # Depending on your application's requirements
+        candidate = Candidate(name=candidate_data['Name'], resume=form, resume_score=candidate_data['Score'], contact=candidate_data['Email'], job=job)
+        candidate.save()
 
         # Return the score in a JSON response
         return JsonResponse({'score': candidate_data['Score']})

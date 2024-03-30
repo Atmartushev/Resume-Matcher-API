@@ -5,12 +5,11 @@ FROM python:3.12
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set work directory
+# Set the working directory
 WORKDIR /code
 
-# Install dependencies first to leverage Docker cache
-COPY requirements.txt /code/
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-# Copy project
+# Copy project files (including requirements.txt)
 COPY . /code/
+
+# Install dependencies
+RUN pip install -r requirements.txt

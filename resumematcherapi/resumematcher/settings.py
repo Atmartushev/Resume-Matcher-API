@@ -48,10 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'corsheaders',
-    'core',
+    'core'
 ]
 
 MIDDLEWARE = [
@@ -65,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'resumematcherapi.urls'
+ROOT_URLCONF = 'resumematcher.urls'
 
 TEMPLATES = [
     {
@@ -83,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'resumematcherapi.wsgi.application'
+WSGI_APPLICATION = 'resumematcher.wsgi.application'
 
 # cors port for react
 CORS_ALLOWED_ORIGINS = [
@@ -151,3 +150,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Define the directory where uploaded files will be stored
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

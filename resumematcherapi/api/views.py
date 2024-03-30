@@ -1,8 +1,14 @@
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.decorators import api_view
+from django.http import JsonResponse
 from core.models import *
 from .serializers import CandidateSerializer, JobSerializer, UserSerlializer
+from .forms import UploadFileForm
+from .aiscripts import ResumeScorer, ResumeParser, RubricGenerator
 
 @api_view(['GET'])
 def getAllUsers(request):
@@ -70,5 +76,25 @@ def getAllCandidatesByJobId(request, job_id):
         # Return an error response if something goes wrong
         return Response({"message": "An error occurred while retrieving candidates"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['POST'])
+def candidate_score(request, job_id):
+    attributes = ["Name", "Email", "Phone Number", "Score"]
+    job = Job.objects.get(id=job_id)
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        job_rubric = RubricGenerator.generate_rubric(job.description)
 
+        # Parse the resume and get the candidate data
+        candidate_score = ResumeScorer.score_resume(request.FILES['file'], job.description, job_rubric)
+
+        candidate_data = ResumeParser.parse_resume(candidate_score, attributes)
+
+        # You may still want to save the candidate or log the score here
+        # Depending on your application's requirements
+
+        # Return the score in a JSON response
+        return JsonResponse({'score': candidate_data['Score']})
+    else:
+        # Return an error message or invalid form notification as JSON
+        return JsonResponse({'error': 'Invalid form data'}, status=400)
 

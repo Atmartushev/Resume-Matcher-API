@@ -36,7 +36,7 @@ if SECRET_KEY is None:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['e89ac7a05b70', 'localhost', '19117c03e499']
 
 
 # Application definition
@@ -151,3 +151,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Define the directory where uploaded files will be stored
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+APPEND_SLASH=False

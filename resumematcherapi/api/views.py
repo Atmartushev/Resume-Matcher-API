@@ -77,7 +77,7 @@ def getAllCandidatesByJobId(request, job_id):
         return Response({"message": "An error occurred while retrieving candidates"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
-def candidate_score(request, job_id):
+def add_candidate(request, job_id):
     attributes = ["Name", "Email", "Phone Number", "Score"]
     job = Job.objects.get(id=job_id)
     form = UploadFileForm(request.POST, request.FILES)
@@ -91,7 +91,7 @@ def candidate_score(request, job_id):
 
         # You may still want to save the candidate or log the score here
         # Depending on your application's requirements
-        candidate = Candidate(name=candidate_data['Name'], resume=form, resume_score=candidate_data['Score'], contact=candidate_data['Email'], job=job)
+        candidate = Candidate(name=candidate_data['Name'], resume=request.FILES['file'], resume_score=candidate_data['Score'], contact=candidate_data['Email'], job=job)
         candidate.save()
 
         # Return the score in a JSON response

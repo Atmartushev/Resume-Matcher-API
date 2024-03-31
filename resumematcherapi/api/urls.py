@@ -14,5 +14,5 @@ urlpatterns = [
     #Candidates
     path('candidate/all/job/id/<int:job_id>',views.getAllCandidatesByJobId),
     
-    path('candidate/score/job/<int:job_id>/', views.candidate_score, name='candidate_score'),
+    path('candidate/score/job/<int:job_id>', views.add_candidate),
 ]

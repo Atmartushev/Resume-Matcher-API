@@ -7,7 +7,7 @@ class User(models.Model):
     email = models.CharField(max_length=100)
 
 class Rubric(models.Model):
-    sections = models.CharField(max_length=400)
+    sections = models.TextField()
 
 class Job(models.Model):
     name = models.CharField(max_length=200)
@@ -17,7 +17,7 @@ class Job(models.Model):
 
 class Candidate(models.Model):
     name = models.CharField(max_length=50)
-    resume = models.CharField(max_length=2000)
-    rubric_score = models.FloatField()
+    resume = models.FileField(upload_to='resumes/')
+    resume_score = models.TextField()
     contact = models.CharField(max_length=50)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)

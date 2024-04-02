@@ -5,15 +5,16 @@ import pandas as pd
 from PyPDF2 import PdfReader 
 import re 
 import json
+import io
 
 class ResumeParser:
 
     def __init__(self):
-        self.api_key = os.getenv('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')
+        self.api_key = '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'
         self.client = openai.OpenAI(api_key=self.api_key)
 
 
-    def parse_resume(self, resume_file, attributes):
+    def parse_resume(self, resume_text, attributes):
         """
         Parses the resume file using ChatGPT based on selected attributes.
 
@@ -25,17 +26,6 @@ class ResumeParser:
         A dictionary with attributes and their values extracted from the resume.
         """
         # Ensure the PDF file is readable
-        resume_text = ""
-
-        try:
-            # Open the PDF file
-            reader = PdfReader(resume_file)
-            # Extract text from the first page
-            resume_text = "\n".join(page.extract_text() for page in reader.pages if page.extract_text())
-        except Exception as e:
-            return {"error": f"Failed to read PDF: {str(e)}"}
-
-
         # Create the prompt for ChatGPT
         attributes_list = "[" + ', '.join(attributes) + "]"
         prompt = self.construct_prompt(attributes_list, resume_text)
@@ -97,6 +87,6 @@ class ResumeParser:
         return parsed_attributes
 
     def construct_prompt(self, attributes_list, resume_text):
-        prompt = f"You are a resume parser. Please search for and display the following attributes in the format of a python dictionary for each attribute in the list of attributes selected by the client, given here: {attributes_list}. \n\nResume:\n{resume_text}"
+        prompt = f"You are a resume parser. Please search for and display the following attributes in the format of a python dictionary for each attribute in the list of attributes selected by the client, given here: {attributes_list}. Emails will most likely be in linked together with @ formats so make sure to look especially close for those. \n\nResume:\n{resume_text}"
         return prompt
 

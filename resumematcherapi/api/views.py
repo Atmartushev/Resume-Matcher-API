@@ -1,3 +1,4 @@
+from io import BytesIO
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -9,6 +10,9 @@ from core.models import *
 from .serializers import CandidateSerializer, JobSerializer, UserSerlializer
 from .forms import UploadFileForm
 from .aiscripts import ResumeScorer, ResumeParser, RubricGenerator
+from PyPDF2 import PdfReader
+import tempfile
+import shutil
 
 @api_view(['GET'])
 def getAllUsers(request):
@@ -78,16 +82,37 @@ def getAllCandidatesByJobId(request, job_id):
 
 @api_view(['POST'])
 def add_candidate(request, job_id):
-    attributes = ["Name", "Email", "Phone Number", "Score"]
+    attributes = ["Name", "Email", "Score"]
     job = Job.objects.get(id=job_id)
+    print(job)
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
-        job_rubric = RubricGenerator.generate_rubric(job.description)
 
+        file = request.FILES['file']
+        pdf_text = []
+
+        try:
+            # Read PDF directly from the uploaded file stream
+            reader = PdfReader(file)
+            pdf_text = [page.extract_text() for page in reader.pages]
+        except Exception as e:
+            return JsonResponse({'error': f'Failed to read PDF: {str(e)}'}, status=400)
+
+        print(request.FILES['file'])
+        rubricGenerator = RubricGenerator()
+        job_rubric = rubricGenerator.generate_rubric(job.jod_description)
+
+        print(pdf_text)
+
+        print(job_rubric)
         # Parse the resume and get the candidate data
-        candidate_score = ResumeScorer.score_resume(request.FILES['file'], job.description, job_rubric)
+        resumeScorer = ResumeScorer()
+        candidate_score = resumeScorer.score_resume(''.join(pdf_text), job.jod_description, job_rubric)
 
-        candidate_data = ResumeParser.parse_resume(candidate_score, attributes)
+        resumeParser = ResumeParser()
+        candidate_data = resumeParser.parse_resume(candidate_score, attributes)
+
+        print(candidate_data)
 
         # You may still want to save the candidate or log the score here
         # Depending on your application's requirements

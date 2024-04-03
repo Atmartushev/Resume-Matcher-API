@@ -82,7 +82,7 @@ def getAllCandidatesByJobId(request, job_id):
 
 @api_view(['POST'])
 def add_candidate(request, job_id):
-    attributes = ["Name", "Email", "Score"]
+    attributes = ["Name", "Email", "Score", "Score Description"]
     job = Job.objects.get(id=job_id)
     print(job)
     form = UploadFileForm(request.POST, request.FILES)
@@ -102,9 +102,6 @@ def add_candidate(request, job_id):
         rubricGenerator = RubricGenerator()
         job_rubric = rubricGenerator.generate_rubric(job.jod_description)
 
-        print(pdf_text)
-
-        print(job_rubric)
         # Parse the resume and get the candidate data
         resumeScorer = ResumeScorer()
         candidate_score = resumeScorer.score_resume(''.join(pdf_text), job.jod_description, job_rubric)
@@ -112,15 +109,20 @@ def add_candidate(request, job_id):
         resumeParser = ResumeParser()
         candidate_data = resumeParser.parse_resume(candidate_score, attributes)
 
-        print(candidate_data)
-
         # You may still want to save the candidate or log the score here
         # Depending on your application's requirements
-        candidate = Candidate(name=candidate_data['Name'], resume=request.FILES['file'], resume_score=candidate_data['Score'], contact=candidate_data['Email'], job=job)
+        candidate = Candidate(
+        name=candidate_data.get('Name', 'Name Not Provided'),
+        resume=request.FILES['file'],
+        resume_score=candidate_data.get('Score', '0'),
+        resume_score_description=candidate_data.get('Score Description', 'N/A'),
+        contact=candidate_data.get('Email', 'Email Not Provided'),
+        job=job
+    )
         candidate.save()
 
         # Return the score in a JSON response
-        return JsonResponse({'score': candidate_data['Score']})
+        return JsonResponse(candidate_data)
     else:
         # Return an error message or invalid form notification as JSON
         return JsonResponse({'error': 'Invalid form data'}, status=400)

@@ -16,8 +16,9 @@ class Job(models.Model):
     rubric = models.ForeignKey(Rubric, on_delete=models.CASCADE)
 
 class Candidate(models.Model):
-    name = models.CharField(max_length=50)
-    resume = models.FileField(upload_to='resumes/')
-    resume_score = models.TextField()
-    contact = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, default='Name Not Provided')
+    resume = models.FileField(upload_to='resumes/', default='N/A')
+    resume_score = models.TextField(default='0')
+    resume_score_description = models.TextField(default='N/A')
+    contact = models.CharField(max_length=50, default='Contact Not Available')
     job = models.ForeignKey(Job, on_delete=models.CASCADE)

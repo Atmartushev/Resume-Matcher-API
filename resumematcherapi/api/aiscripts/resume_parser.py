@@ -87,6 +87,6 @@ class ResumeParser:
         return parsed_attributes
 
     def construct_prompt(self, attributes_list, resume_text):
-        prompt = f"You are a resume parser. Please search for and display the following attributes in the format of a python dictionary for each attribute in the list of attributes selected by the client, given here: {attributes_list}. Emails will most likely be in linked together with @ formats so make sure to look especially close for those. \n\nResume:\n{resume_text}"
+        prompt = f"You are a resume parser. Please search for and display the following attributes in the format of a python dictionary for each attribute in the list of attributes selected by the client, given here: {attributes_list}. Emails will most likely be in linked together with @ formats so make sure to look especially close for those. \n\nResume:\n{resume_text}. Make sure to include the full score for each description and explanation for each"
         return prompt
 

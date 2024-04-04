@@ -1,3 +1,4 @@
+from io import BytesIO
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -9,6 +10,9 @@ from core.models import *
 from .serializers import CandidateSerializer, JobSerializer, UserSerlializer
 from .forms import UploadFileForm
 from .aiscripts import ResumeScorer, ResumeParser, RubricGenerator
+from PyPDF2 import PdfReader
+import tempfile
+import shutil
 
 @api_view(['GET'])
 def getAllUsers(request):
@@ -78,24 +82,47 @@ def getAllCandidatesByJobId(request, job_id):
 
 @api_view(['POST'])
 def add_candidate(request, job_id):
-    attributes = ["Name", "Email", "Phone Number", "Score"]
+    attributes = ["Name", "Email", "Score", "Score Description"]
     job = Job.objects.get(id=job_id)
+    print(job)
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
-        job_rubric = RubricGenerator.generate_rubric(job.description)
+
+        file = request.FILES['file']
+        pdf_text = []
+
+        try:
+            # Read PDF directly from the uploaded file stream
+            reader = PdfReader(file)
+            pdf_text = [page.extract_text() for page in reader.pages]
+        except Exception as e:
+            return JsonResponse({'error': f'Failed to read PDF: {str(e)}'}, status=400)
+
+        print(request.FILES['file'])
+        rubricGenerator = RubricGenerator()
+        job_rubric = rubricGenerator.generate_rubric(job.jod_description)
 
         # Parse the resume and get the candidate data
-        candidate_score = ResumeScorer.score_resume(request.FILES['file'], job.description, job_rubric)
+        resumeScorer = ResumeScorer()
+        candidate_score = resumeScorer.score_resume(''.join(pdf_text), job.jod_description, job_rubric)
 
-        candidate_data = ResumeParser.parse_resume(candidate_score, attributes)
+        resumeParser = ResumeParser()
+        candidate_data = resumeParser.parse_resume(candidate_score, attributes)
 
         # You may still want to save the candidate or log the score here
         # Depending on your application's requirements
-        candidate = Candidate(name=candidate_data['Name'], resume=request.FILES['file'], resume_score=candidate_data['Score'], contact=candidate_data['Email'], job=job)
+        candidate = Candidate(
+        name=candidate_data.get('Name', 'Name Not Provided'),
+        resume=request.FILES['file'],
+        resume_score=candidate_data.get('Score', '0'),
+        resume_score_description=candidate_data.get('Score Description', 'N/A'),
+        contact=candidate_data.get('Email', 'Email Not Provided'),
+        job=job
+    )
         candidate.save()
 
         # Return the score in a JSON response
-        return JsonResponse({'score': candidate_data['Score']})
+        return JsonResponse(candidate_data)
     else:
         # Return an error message or invalid form notification as JSON
         return JsonResponse({'error': 'Invalid form data'}, status=400)

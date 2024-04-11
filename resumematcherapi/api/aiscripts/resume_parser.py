@@ -1,6 +1,7 @@
+import os
+from dotenv import load_dotenv
 import gradio as gr
 import openai
-import os
 import pandas as pd
 from PyPDF2 import PdfReader 
 import re 
@@ -8,10 +9,6 @@ import json
 import io
 
 class ResumeParser:
-
-    def __init__(self):
-        self.api_key = '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'
-        self.client = openai.OpenAI(api_key=self.api_key)
 
 
     def parse_resume(self, resume_text, attributes):
@@ -31,7 +28,8 @@ class ResumeParser:
         prompt = self.construct_prompt(attributes_list, resume_text)
         
         # Query OpenAI's ChatGPT with the prompt
-        client = openai.OpenAI(api_key="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")
+        load_dotenv()
+        client = openai.OpenAI(api_key=os.getenv('SECRET_KEY_CHATGPT'))
         try:
             # Adjusted call for the new OpenAI API
             response = client.chat.completions.create(

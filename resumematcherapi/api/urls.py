@@ -14,5 +14,6 @@ urlpatterns = [
     #Candidates
     path('candidate/all/job/id/<int:job_id>',views.getAllCandidatesByJobId),
     
+    path('candidate/score/job/<int:job_id>/generaterubric', views.add_candidate_with_generated_rubric),
     path('candidate/score/job/<int:job_id>', views.add_candidate),
 ]

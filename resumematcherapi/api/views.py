@@ -81,7 +81,7 @@ def getAllCandidatesByJobId(request, job_id):
         return Response({"message": "An error occurred while retrieving candidates"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
-def add_candidate(request, job_id):
+def add_candidate_with_generated_rubric(request, job_id):
     attributes = ["Name", "Email", "Score", "Score Description"]
     job = Job.objects.get(id=job_id)
     print(job)
@@ -127,3 +127,44 @@ def add_candidate(request, job_id):
         # Return an error message or invalid form notification as JSON
         return JsonResponse({'error': 'Invalid form data'}, status=400)
 
+@api_view(['POST'])
+def add_candidate(request, job_id):
+    attributes = ["Name", "Email", "Score", "Score Description"]
+    job = Job.objects.get(id=job_id)
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+
+        file = request.FILES['file']
+        pdf_text = []
+
+        try:
+            # Read PDF directly from the uploaded file stream
+            reader = PdfReader(file)
+            pdf_text = [page.extract_text() for page in reader.pages]
+        except Exception as e:
+            return JsonResponse({'error': f'Failed to read PDF: {str(e)}'}, status=400)
+
+        # Parse the resume and get the candidate data
+        resumeScorer = ResumeScorer()
+        candidate_score = resumeScorer.score_resume(''.join(pdf_text), job.jod_description, job.rubric)
+
+        resumeParser = ResumeParser()
+        candidate_data = resumeParser.parse_resume(candidate_score, attributes)
+
+        # You may still want to save the candidate or log the score here
+        # Depending on your application's requirements
+        candidate = Candidate(
+        name=candidate_data.get('Name', 'Name Not Provided'),
+        resume=request.FILES['file'],
+        resume_score=candidate_data.get('Score', '0'),
+        resume_score_description=candidate_data.get('Score Description', 'N/A'),
+        contact=candidate_data.get('Email', 'Email Not Provided'),
+        job=job
+    )
+        candidate.save()
+
+        # Return the score in a JSON response
+        return JsonResponse(candidate_data)
+    else:
+        # Return an error message or invalid form notification as JSON
+        return JsonResponse({'error': 'Invalid form data'}, status=400)

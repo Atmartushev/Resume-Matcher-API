@@ -9,7 +9,9 @@ urlpatterns = [
 
     #JOBS
     path('job/all/user/id/<int:user_id>', views.getAllJobsByUserId),
+    path('job/add/user/', views.post_job_by_user_id, name='post_job_by_user_id'),
 
+    path('job/delete/id/<int:job_id>', views.delete_job, name='delete_job'),
 
     #Candidates
     path('candidate/all/job/id/<int:job_id>',views.getAllCandidatesByJobId),

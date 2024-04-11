@@ -6,10 +6,23 @@ class UserSerlializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+    
 class JobSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(write_only=True)
+    rubric_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Job
-        fields = '__all__'
+        fields = ['id','name', 'jod_description', 'user_id', 'rubric_id', 'date_created', 'priority']
+
+    def create(self, validated_data):
+        user_id = validated_data.pop('user_id')
+        rubric_id = validated_data.pop('rubric_id')
+        user = User.objects.get(id=user_id)
+        rubric = Rubric.objects.get(id=rubric_id)
+        return Job.objects.create(user=user, rubric=rubric, **validated_data)
+
+
 
 class CandidateSerializer(serializers.ModelSerializer):
     class Meta:

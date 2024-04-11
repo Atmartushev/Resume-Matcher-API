@@ -80,6 +80,30 @@ def getAllCandidatesByJobId(request, job_id):
         # Return an error response if something goes wrong
         return Response({"message": "An error occurred while retrieving candidates"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['POST'])
+def post_job_by_user_id(request):
+    try:
+        user = User.objects.get(id=request.data['user_id'])
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = JobSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_job(request, job_id):
+    try:
+        job = Job.objects.get(id=job_id)
+    except Job.DoesNotExist:
+        return Response({'message': 'Job not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    job.delete()
+    return Response({'message': 'Job was successfully deleted'}, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 def add_candidate_with_generated_rubric(request, job_id):
     attributes = ["Name", "Email", "Score", "Score Description"]

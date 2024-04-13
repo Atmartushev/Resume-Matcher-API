@@ -22,9 +22,12 @@ class JobSerializer(serializers.ModelSerializer):
         rubric = Rubric.objects.get(id=rubric_id)
         return Job.objects.create(user=user, rubric=rubric, **validated_data)
 
-
-
 class CandidateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Candidate
         fields ='__all__'
+
+class RubricSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rubric
+        fields = '__all__'

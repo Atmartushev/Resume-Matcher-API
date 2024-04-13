@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from core.models import *
-from .serializers import CandidateSerializer, JobSerializer, UserSerlializer
+from .serializers import CandidateSerializer, JobSerializer, RubricSerializer, UserSerlializer
 from .forms import UploadFileForm
 from .aiscripts import ResumeScorer, ResumeParser, RubricGenerator
 from PyPDF2 import PdfReader
@@ -152,6 +152,24 @@ def add_candidate_with_generated_rubric(request, job_id):
         return JsonResponse({'error': 'Invalid form data'}, status=400)
 
 @api_view(['POST'])
+def post_rubric(request):
+    serializer = RubricSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_rubric(request, id):
+    try:
+        rubric = Rubric.objects.get(id = id)
+        serializer = RubricSerializer(rubric)
+        return Response(serializer.data, status=201)
+    except:
+        return Response({"message": "Rubric not found"}, status=404)
+
+@api_view(['POST'])
 def add_candidate(request, job_id):
     attributes = ["Name", "Email", "Score", "Score Description"]
     job = Job.objects.get(id=job_id)
@@ -192,3 +210,4 @@ def add_candidate(request, job_id):
     else:
         # Return an error message or invalid form notification as JSON
         return JsonResponse({'error': 'Invalid form data'}, status=400)
+      

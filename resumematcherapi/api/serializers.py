@@ -9,7 +9,7 @@ class UserSerlializer(serializers.ModelSerializer):
     
 class JobSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(write_only=True)
-    rubric_id = serializers.IntegerField(write_only=True)
+    rubric_id = serializers.IntegerField()
 
     class Meta:
         model = Job

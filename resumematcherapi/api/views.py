@@ -50,6 +50,19 @@ def addUser(request):
         return Response({"message": "Invalid user data"}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.data)
 
+@api_view(['PUT'])
+def update_user(request, id):
+    try:
+        user = User.objects.get(id=id)
+        serializer = UserSerlializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+
 @api_view(['GET'])
 def getAllJobsByUserId(request, user_id):
     try:
@@ -65,6 +78,41 @@ def getAllJobsByUserId(request, user_id):
         # Return an error response if something goes wrong
         return Response({"message": "An error occurred while retrieving jobs"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['POST'])
+def post_job_by_user_id(request):
+    try:
+        user = User.objects.get(id=request.data['user_id'])
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = JobSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+def update_job(request, job_id):
+    try:
+        job = Job.objects.get(id=job_id)
+        serializer = JobSerializer(job, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({"message": "Job not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['DELETE'])
+def delete_job(request, job_id):
+    try:
+        job = Job.objects.get(id=job_id)
+    except Job.DoesNotExist:
+        return Response({'message': 'Job not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    job.delete()
+    return Response({'message': 'Job was successfully deleted'}, status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def getAllCandidatesByJobId(request, job_id):
     try:
@@ -79,30 +127,6 @@ def getAllCandidatesByJobId(request, job_id):
     except:
         # Return an error response if something goes wrong
         return Response({"message": "An error occurred while retrieving candidates"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['POST'])
-def post_job_by_user_id(request):
-    try:
-        user = User.objects.get(id=request.data['user_id'])
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serializer = JobSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['DELETE'])
-def delete_job(request, job_id):
-    try:
-        job = Job.objects.get(id=job_id)
-    except Job.DoesNotExist:
-        return Response({'message': 'Job not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    job.delete()
-    return Response({'message': 'Job was successfully deleted'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def add_candidate_with_generated_rubric(request, job_id):
@@ -150,25 +174,7 @@ def add_candidate_with_generated_rubric(request, job_id):
     else:
         # Return an error message or invalid form notification as JSON
         return JsonResponse({'error': 'Invalid form data'}, status=400)
-
-@api_view(['POST'])
-def post_rubric(request):
-    serializer = RubricSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=201)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-@api_view(['GET'])
-def get_rubric(request, id):
-    try:
-        rubric = Rubric.objects.get(id = id)
-        serializer = RubricSerializer(rubric)
-        return Response(serializer.data, status=201)
-    except:
-        return Response({"message": "Rubric not found"}, status=404)
-
 @api_view(['POST'])
 def add_candidate(request, job_id):
     attributes = ["Name", "Email", "Score", "Score Description"]
@@ -210,4 +216,66 @@ def add_candidate(request, job_id):
     else:
         # Return an error message or invalid form notification as JSON
         return JsonResponse({'error': 'Invalid form data'}, status=400)
-      
+
+@api_view(['PUT'])
+def update_candidate(request, job_id):
+    try:
+        candidate = Candidate.objects.get(id=job_id)
+        serializer = CandidateSerializer(candidate, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({"message": "Candidate not found"}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+def delete_candidate(request, job_id):
+    try:
+        candidate = Candidate.objects.get(id=job_id)
+    except Candidate.DoesNotExist:
+        return Response({'message': 'Candidate not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    candidate.delete()
+    return Response({'message': 'Candidate was successfully deleted'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def post_rubric(request):
+    serializer = RubricSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_rubric(request, id):
+    try:
+        rubric = Rubric.objects.get(id = id)
+        serializer = RubricSerializer(rubric)
+        return Response(serializer.data, status=201)
+    except:
+        return Response({"message": "Rubric not found"}, status=404)
+
+
+@api_view(['PUT'])
+def update_rubric(request, id):
+    try:
+        rubric = Rubric.objects.get(id=id)
+        serializer = RubricSerializer(rubric, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({"message": "Rubric not found"}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+def delete_rubric(request, id):
+    try:
+        rubric = Rubric.objects.get(id=id)
+    except Rubric.DoesNotExist:
+        return Response({'message': 'Rubric not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    rubric.delete()
+    return Response({'message': 'Rubric was successfully deleted'}, status=status.HTTP_200_OK)

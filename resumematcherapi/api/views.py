@@ -64,6 +64,19 @@ def update_user(request, id):
     
 
 @api_view(['GET'])
+def getJobById(request,job_id):
+    try:
+        job = Job.objects.get(id=job_id)
+        serializer = JobSerializer(job)
+        return Response(serializer.data)
+    except Job.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+ 
+
+
+
+
+@api_view(['GET'])
 def getAllJobsByUserId(request, user_id):
     try:
         # Get all jobs for the given user_id

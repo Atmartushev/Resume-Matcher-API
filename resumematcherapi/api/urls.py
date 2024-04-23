@@ -17,7 +17,7 @@ urlpatterns = [
 
     #Candidates
     path('candidate/all/job/id/<int:job_id>',views.getAllCandidatesByJobId),
-    path('candidate/score/job/<int:job_id>/generaterubric', views.add_candidate_with_generated_rubric),
+    path('candidate/score/generaterubric/job/<int:job_id>', views.add_candidate_with_generated_rubric),
     path('candidate/score/job/<int:job_id>', views.add_candidate),
     path('candidate/update/<int:job_id>', views.update_candidate),
     path('candidate/delete/<int:job_id>', views.delete_candidate),
@@ -27,4 +27,7 @@ urlpatterns = [
     path('rubric/<int:id>', views.get_rubric),
     path('rubric/update/<int:id>', views.update_rubric),
     path('rubric/delete/<int:id>', views.delete_rubric),
-]
+
+    #Resume
+    path('candidate/<int:candidate_id>/job/<int:job_id>/resume', views.get_resume_for_candidate),
+]   

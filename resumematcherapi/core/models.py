@@ -22,11 +22,13 @@ class Job(models.Model):
     rubric = models.ForeignKey(Rubric, on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='low')
+    location = models.CharField(max_length=100, default='N/A')
 
 class Candidate(models.Model):
     name = models.CharField(max_length=250, default='Name Not Provided')
     resume = models.FileField(upload_to='resumes/', default='N/A')
+    raw_resume = models.BinaryField(default=b'\x08')
     resume_score = models.TextField(default='0')
     resume_score_description = models.TextField(default='N/A')
-    contact = models.CharField(max_length=100, default='Contact Not Available')
+    contact = models.CharField(max_length=100, default='Contact Not Available', null=False, blank=False)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)

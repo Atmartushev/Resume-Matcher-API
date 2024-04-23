@@ -97,7 +97,7 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('resume-matcher-aws'),  # Your RDS database name
+        'NAME': os.getenv('postgres'),  # Your RDS database name
         'USER': os.getenv('RDS_USERNAME'),  # Your RDS instance username
         'PASSWORD': os.getenv('RDS_PASSWORD'),  # Your RDS password
         'HOST': os.getenv('RDS_HOSTNAME'),  # Your RDS instance endpoint

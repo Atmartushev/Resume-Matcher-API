@@ -27,6 +27,7 @@ class Job(models.Model):
 class Candidate(models.Model):
     name = models.CharField(max_length=250, default='Name Not Provided')
     resume = models.FileField(upload_to='resumes/', default='N/A')
+    raw_resume = models.BinaryField(default=b'\x08')
     resume_score = models.TextField(default='0')
     resume_score_description = models.TextField(default='N/A')
     contact = models.CharField(max_length=100, default='Contact Not Available', null=False, blank=False)

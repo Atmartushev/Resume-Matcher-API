@@ -177,6 +177,7 @@ def add_candidate_with_generated_rubric(request, job_id):
         candidate = Candidate(
         name=candidate_data.get('Name', 'Name Not Provided'),
         resume=request.FILES['file'],
+        raw_resume=file.read(),
         resume_score=candidate_data.get('Score', '0'),
         resume_score_description=candidate_data.get('Score Description', 'N/A'),
         contact=candidate_data.get('Email', 'Email Not Provided'),

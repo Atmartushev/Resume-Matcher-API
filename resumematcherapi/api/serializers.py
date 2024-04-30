@@ -13,7 +13,7 @@ class JobSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        fields = ['id','name', 'jod_description', 'user_id', 'rubric_id', 'date_created', 'priority']
+        fields = ['id','name', 'jod_description', 'user_id', 'rubric_id', 'date_created', 'priority', 'location']
 
     def create(self, validated_data):
         user_id = validated_data.pop('user_id')

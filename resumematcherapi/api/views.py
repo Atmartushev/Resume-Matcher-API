@@ -15,6 +15,7 @@ from PyPDF2 import PdfReader
 import base64
 import tempfile
 import shutil
+from django.http import FileResponse
 
 @api_view(['GET'])
 def getAllUsers(request):
@@ -169,6 +170,8 @@ def add_candidate_with_generated_rubric(request, job_id):
         resumeScorer = ResumeScorer()
         candidate_score = resumeScorer.score_resume(''.join(pdf_text), job.jod_description, job_rubric)
 
+        print(candidate_score)
+        
         resumeParser = ResumeParser()
         candidate_data = resumeParser.parse_resume(candidate_score, attributes)
 
@@ -296,3 +299,20 @@ def delete_rubric(request, id):
 
     rubric.delete()
     return Response({'message': 'Rubric was successfully deleted'}, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+def get_resume_for_candidate(request, candidate_id, job_id):
+    try:
+        candidate = Candidate.objects.get(id=candidate_id, job_id=job_id)
+    except Candidate.DoesNotExist:
+        return Response({'message': 'Candidate not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Assuming the resume is a FileField on the Candidate model
+    resume = candidate.resume
+
+    # Create a FileResponse to send the file
+    response = FileResponse(resume.open('rb'), content_type='application/pdf')
+
+    return response

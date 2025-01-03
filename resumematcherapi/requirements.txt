@@ -1,0 +1,10 @@
+asgiref==3.7.2
+Django
+djangorestframework==3.15.1
+psycopg2==2.9.9
+python-dotenv==1.0.1
+sqlparse==0.4.4
+django-cors-headers==4.3.1
+openai
+PyPDF2
+gradio
